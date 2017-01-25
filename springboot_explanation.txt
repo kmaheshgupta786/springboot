@@ -1,0 +1,226 @@
+springboot
+-------------
+
+In this course:
+Building an end to end app
+Spring boot features
+configuration and customization
+
+-----------------------------------------------------------------------------------------------
+
+video : 3
+
+what is spring boot?
+
+spring boot makes it easy to create stand-alone, production-grade spring based application
+that you can "just run".
+
+
+-----------------------------------------------------------------------------------------------
+
+video : 4
+
+Spring and some of its problems.
+
+Spring is - application framework, programming and configuration model, infrastructure support(connection to db)
+
+problems with spring : 	Huge framework, 
+						multiple setup steps (like connect to oracle, mongodb, couch base etc like this), 
+						multiple configuration steps, 
+						multiple build and deploy steps
+						
+
+-----------------------------------------------------------------------------------------------
+
+video : 5
+
+what spring boot gives us :
+
+- convention over configuration (only 20% of configuration req when compare with spring)
+- stand alone (even web application as well, as it has inbuild servlet container)
+- production ready code
+
+
+-----------------------------------------------------------------------------------------------
+
+video : 6
+
+setup : java 8 sdk
+
+download sts and setup runtime env as jdk8
+
+
+-----------------------------------------------------------------------------------------------
+
+video : 7
+
+Maven
+
+-----------------------------------------------------------------------------------------------
+
+video : 8
+
+Creating a spring boot project
+
+new -> new maven project -> select check box - create simple project (skip archetype selection)
+
+group id : io.javabrains.springbootquickstart
+artifact : course-api
+
+open pom.xml and update
+
+<project>
+
+	<parent>
+		<groupId>org.springframework.boot</groupId>
+		<artifactId>spring-boot-starter-parent</artifactId>
+		<version>1.4.2.RELEASE</version>
+	</parent>
+	
+	<dependencies>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-web</artifactId>
+		</dependency>
+	</dependencies>
+	
+	<properties>
+		<java.version>1.8</java.version>
+	</properties>
+</project>
+
+
+-----------------------------------------------------------------------------------------------
+
+video : 9 
+
+Starting a spring boot application
+
+new -> class 
+
+pkg: io.javabrains.springbootstarter
+CourseApiApp
+
+
+
+@SpringBootApplication
+public class CourseApiApp {
+
+	public static void main(String[] args) {
+		
+		SpringApplication.run(CourseApiApp.class, args);  // static method
+	}
+
+}
+
+
+-----------------------------------------------------------------------------------------------
+
+video : 10
+
+spring boot startup steps
+
+static method do the follwoing tasks:
+- sets up default configuration
+- starts spring application context 
+- performs class path scan (scan all classes which are all controllers or services like that)
+- starts tomcat server
+
+-----------------------------------------------------------------------------------------------
+
+video : 11
+
+Adding a REST Controller
+
+
+
+@RestController
+public class HellowController {
+
+	@RequestMapping("/hello")
+	public String sayHi(){
+		return "Hi";
+	}
+	
+}
+
+
+@SpringBootApplication
+public class CourseApiApp {
+
+	public static void main(String[] args) {
+		
+		SpringApplication.run(CourseApiApp.class, args);
+	}
+
+}
+
+
+-----------------------------------------------------------------------------------------------
+
+video : 12
+
+Returning Objects From Controller
+
+@RestController
+public class TopicController {
+
+	@RequestMapping("/topics")
+	public List<Topic> getAllTopics(){
+		return Arrays.asList(
+				new Topic("spring", "spring framework", "spring framework description"),
+				new Topic("java", "java framework", "java description"),
+				new Topic("javaScript", "javaScript framework", "javaScript framework description")
+				);
+	}
+}
+
+
+browser url: http://localhost:8002/topics
+o/p: [{"id":"spring","name":"spring framework","description":"spring framework description"},{"id":"java","name":"java framework","description":"java description"},{"id":"javaScript","name":"javaScript framework","description":"javaScript framework description"}]
+
+
+-----------------------------------------------------------------------------------------------
+
+video : 13
+
+What's Happening Here: Bill Of Materials
+
+current pom.xml
+	---
+	<parent>
+		<groupId>org.springframework.boot</groupId>
+		<artifactId>spring-boot-starter-parent</artifactId>
+		<version>1.4.2.RELEASE</version>
+	</parent>
+	
+	<dependencies>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-web</artifactId>
+		</dependency>
+	</dependencies>
+	
+	--
+	
+	assume u kept only <parent> tag and not added <dependencies> tag then
+	u cant see the maven dependencies on LNP in STS
+	
+	After u updated with <dependencies> tag then only it will download all dependencies from mvn
+	
+	bill of meterials mans "the group of jars which will work well"
+	eg: in current pom parent tag version. based on version it downloads the all spring boot dependent jars and tomcat version jars like 6 or 7 or 8.
+	
+-----------------------------------------------------------------------------------------------
+
+video : 14
+	
+What's Happening Here: Embedded Servlet Container
+
+advantages are:
+- convenience
+- servlet container config is now application config (need not to think which server has t o use to run)
+- stand alone application
+- useful for micro services architecture projects
+
+
