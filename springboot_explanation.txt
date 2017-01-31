@@ -299,13 +299,95 @@ Learn how to make a POST REST API work using Spring MVC.
 
 
 
+TopicController.java 
+
+
+@RequestMapping(method=RequestMethod.POST, value="/topics")   ---- to tell to spring its post method
+	public void addTopic(@RequestBody Topic topic){           ---- to tell to spring the req payload is json 
+		topicService.addTopic(topic);
+	}
+	
+	
+	
+TopicService.java
+
+private List<Topic> topics = new ArrayList<>(Arrays.asList(
+			new Topic("spring", "spring framework", "spring framework description"),
+			new Topic("java", "java framework", "java description"),
+			new Topic("javaScript", "javaScript framework", "javaScript framework description")
+			));
+			
+			// if you wont keep new ArrayList<>(Arrays.asList --- ) u will get the error while u adding the topic 
+			error msg like :
+			java.lang.UnsupportedOperationException: null
+				at java.util.AbstractList.add(AbstractList.java:148) ~[na:1.8.0_92]
+				at java.util.AbstractList.add(AbstractList.java:108) ~[na:1.8.0_92]
+				at io.javabrains.springbootstarter.topic.TopicService.addTopic(TopicService.java:33) ~[classes/:na]
+				at io.javabrains.springbootstarter.topic.TopicController.addTopic(TopicController.java:31) ~[classes/:na]
+				at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method) ~[na:1.8.0_92]
+				at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62) ~[na:1.8.0_92]
+			
+public void addTopic(Topic topic) {
+		topics.add(topic);
+		
+	}
+
+
+
+-----------------------------------------------------------------------------------------------
+
+video :	2.6 Implementing Update and Delete
+
+Let's implement the update and delete operations on resources using the PUT and DELETE methods.
 
 
 
 
+put method / update method:
+
+TopicController.java 
+
+@RequestMapping(method=RequestMethod.PUT, value="/topics/{id}")
+	public void updateTopic(@RequestBody Topic topic, @PathVariable String id){
+		topicService.updateTopic(id, topic);
+	}
+	
+	
+TopicService.java
+
+public void updateTopic(String id, Topic topic) {
+		for(int i=0; i < topics.size(); i++){
+			Topic t = topics.get(i);
+			if(t.getId().equals(id)){
+				topics.set(i, topic);
+				return;
+			}
+		}
+		
+	}
 
 
 
 
+delete method / remove method:
+
+TopicController.java 
+
+@RequestMapping(method=RequestMethod.DELETE, value="/topics/{id}")
+	public void deleteTopic(@PathVariable String id){
+		 topicService.deleteTopic(id);
+	}	
+	
+TopicService.java
+	
+public void deleteTopic(String id) {
+		topics.removeIf(t -> t.getId().equals(id));
+	}	
+	
+-----------------------------------------------------------------------------------------------
+
+3.1 Unit Overview
+
+In this unit, we'll look at a few more ways to create Spring Boot applications from the scratch.
 
 	
