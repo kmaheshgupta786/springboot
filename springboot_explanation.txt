@@ -224,3 +224,88 @@ advantages are:
 - useful for micro services architecture projects
 
 
+-----------------------------------------------------------------------------------------------
+
+video : 2.1 How Spring MVC Works
+Learn what Spring MVC is and how it fits in to the view tier of your RESt API application.
+
+2.2 The REST API we'll build
+Let's quickly go over the API we'll be building - what the resources and the methods are.
+
+
+
+-----------------------------------------------------------------------------------------------
+
+video : 2.3 Creating a business service
+
+Learn how to create a Spring business service with the @Service annotation.
+
+create class:
+
+@Service
+public class TopicService {
+
+	private List<Topic> topics = Arrays.asList(
+			new Topic("spring", "spring framework", "spring framework description"),
+			new Topic("java", "java framework", "java description"),
+			new Topic("javaScript", "javaScript framework", "javaScript framework description")
+			);
+	
+	public List<Topic> getAllTopics(){
+		return topics;
+	}
+	
+}
+
+update existing controller class
+
+@RestController
+public class TopicController {
+
+	@Autowired
+	private TopicService topicService;
+	
+	@RequestMapping("/topics")
+	public List<Topic> getAllTopics(){
+		return topicService.getAllTopics();
+	}
+}
+
+
+-----------------------------------------------------------------------------------------------
+
+video : 2.4 Getting a single resource
+
+Learn how to create a GET REST API using Spring MVC that maps to a collection URI.
+
+changes in TopicService - class 
+
+public Topic getTopic(String id){
+		return topics.stream().filter(t -> t.getId().equalsIgnoreCase(id)).findFirst().get();
+	}
+
+changes in controller class
+
+@RequestMapping("/topics/{id}")
+	public Topic getTopic(@PathVariable String id){
+		return topicService.getTopic(id);
+	}
+
+-----------------------------------------------------------------------------------------------
+
+video :	2.5 Creating a new resource using POST
+
+Learn how to make a POST REST API work using Spring MVC.
+
+
+
+
+
+
+
+
+
+
+
+
+	
