@@ -390,4 +390,362 @@ public void deleteTopic(String id) {
 
 In this unit, we'll look at a few more ways to create Spring Boot applications from the scratch.
 
+multiple approaches to create spring boot application are:
+- Spring initializr
+- spring boot CLI
+- STS IDE
+
+Configuration.
+
+-----------------------------------------------------------------------------------------------
+
+3.2 Using Spring Initializr
+
+Learn how to use the handy online tool called Spring Initializr to select the type of Spring Boot application you need.
+
+open : http://start.spring.io	
+select generate a : maven project
+select spring boot : 1.4.2
+
+choose which are all modules you like to work on and then click on generate button.
+It will give you downloadable zip file, just save and import to ur sts workspace.
+
+
+-----------------------------------------------------------------------------------------------
+
+3.3 Using Spring Boot CLI
+
+Learn how to run quick Groovy scripts as complete Spring applications, directly from the command line.
+
+
+-----------------------------------------------------------------------------------------------
+
+3.4 Using the STS IDE
+
+Learn how to create a new Spring Boot project directly from the Spring Tool Suite IDE's new project wizard. 
+
+new -> spring starter project -
+	choose options
+	-> click next  -> click finish
+
+-----------------------------------------------------------------------------------------------
+
+3.5 Using application properties	
+
+Learn how to configure some basic properties for your Spring Boot application using the application.properties file.
+
+we can customize spring boot application through application.properties file
+
+eg: create application.properties file
+server.port=8081
+
+
+to know list of properties names search for "common application properties" for spring application 
+
+https://docs.spring.io/spring-boot/docs/current/reference/html/common-application-properties.html
+
+
+-----------------------------------------------------------------------------------------------
+
+
+4.1 What is JPA
+
+Understand what JPA and Spring Data JPA is. Learn how it can help us do Object-Relational mapping.
+
+basic explantaion what is mean of jpa
+what is mean of orm tool
+
+
+-----------------------------------------------------------------------------------------------
+
+
+4.2 Adding Spring Data JPA
+
+In this video, we'll create a new project and add the necessary dependencies to use Spring Data JPA to connect to a database.
+
+open sts -> new -> spring starter project -
+					course-api-database
+					fill details
+				-> click next
+				-> select options example : under web - select web
+											under SQl - select jpa and apache derby
+				-> click next/finish
+
+				
+-----------------------------------------------------------------------------------------------
+
+4.3 Creating a Spring Data JPA Repository
+
+Learn how to create a Repository interface using Spring Data JPA.	
+
+changes in topic.java
+
+@Entity
+public class Topic {
+
+	@Id
+	private String id;
+	private String name;
+	private String description;		
+
+
+
+create one interface extend it with CrudRepository (this class comes from spring framework)
+
+CrudRepository - will take care of all basic CRUD operations like getall, get one, update, delete and save. 
+this class is type of Generic, so we have to pass the parameters like
+	1 - on which model class you are going to implement CRUD operations (in our example its TOPIC class)
+	2 - Id data type in the model class (in our example it is String id)
+
 	
+	
+import org.springframework.data.repository.CrudRepository;
+
+public interface TopicRepository extends CrudRepository<Topic, String>{
+
+}	
+
+
+-----------------------------------------------------------------------------------------------
+
+
+4.4 Making Crud Operations with Repository
+
+Understandn and use basic CRUD operations directly on the database using the methods provided by CrudRepository.
+
+
+
+updated service class: TopicService.java
+
+@Service
+public class TopicService {
+
+	@Autowired
+	private TopicRepository topicRepository;
+	
+	public List<Topic> getAllTopics(){
+		List<Topic> topics = new ArrayList<>();
+		topicRepository.findAll()             // at this level it return all iterable objs, so we have to convert these to Topic object and later suppose to add to List - this done by java8 Method reference logic.
+		.forEach(topics::add);
+		return topics;
+	}
+	
+	public Topic getTopic(String id){
+		return topicRepository.findOne(id);
+	}
+
+	public void addTopic(Topic topic) {
+		topicRepository.save(topic);
+		
+	}
+
+	public void updateTopic(String id, Topic topic) {
+		topicRepository.save(topic);		// for update and save we have to use the same .save method.
+	}
+
+	public void deleteTopic(String id) {
+		topicRepository.delete(id);
+	}
+}
+
+just create TopicRepository obj with use of autowired.
+And call respective methods like findall, findone, save, delete.
+
+
+
+-----------------------------------------------------------------------------------------------
+
+4.5 Adding Course APIs
+
+Now let's apply our learning to create a set of Course REST APIs.
+
+create the same functionallity for the "Course" class.
+
+
+CourseController.java 
+---------------------
+
+@RestController
+public class CourseController {
+
+	@Autowired
+	private CourseService courseService;
+	
+	@RequestMapping("/topics/{id}/courses")
+	public List<Course> getAllCourses(@PathVariable String id){
+		return courseService.getAllCourses(id);
+	}
+	
+	@RequestMapping("/topics/{topicId}/courses/{id}")
+	public Course getCourse(@PathVariable String id){
+		return courseService.getCourse(id);
+	}
+	
+	@RequestMapping(method=RequestMethod.POST, value="/topics/{topicId}/courses")
+	public void addCourse(@RequestBody Course course, @PathVariable String topicId){
+		course.setTopic(new Topic(topicId,"",""));
+		courseService.addCourse(course);
+	}
+	
+	@RequestMapping(method=RequestMethod.PUT, value="/topics/{topicId}/courses/{id}")
+	public void updateCourse(@RequestBody Course course, @PathVariable String topicId, @PathVariable String id){
+		course.setTopic(new Topic(topicId,"",""));
+		courseService.updateCourse(course);
+	}
+	
+	@RequestMapping(method=RequestMethod.DELETE, value="/topics/{topicId}/courses/{id}")
+	public void deleteTopic(@PathVariable String id){
+		courseService.deleteCourse(id);
+	}
+}
+
+
+CourseService.java
+------------------
+
+@Service
+public class CourseService {
+
+	@Autowired
+	private CourseRepository courseRepository;
+	
+	public List<Course> getAllCourses(){
+		List<Course> topics = new ArrayList<>();
+		courseRepository.findAll()
+		.forEach(topics::add);
+		return topics;
+	}
+	
+	public Course getCourse(String id){
+		return courseRepository.findOne(id);
+	}
+
+	public void addCourse(Course course) {
+		courseRepository.save(course);
+		
+	}
+
+	public void updateCourse(Course course) {
+		courseRepository.save(course);		
+	}
+
+	public void deleteCourse(String id) {
+		courseRepository.delete(id);
+	}
+}
+
+
+
+
+Course.java
+------------
+
+@Entity
+public class Course {
+
+	@Id
+	private String id;
+	private String name;
+	private String description;
+	
+	private Topic topic;
+	
+	
+	public Course() {
+		
+	}
+	
+	public Course(String id, String name, String description, String topicId) {
+		super();
+		this.id = id;
+		this.name = name;
+		this.description = description;
+		this.topic = new Topic(topicId,"","");
+	}
+	
+	public Topic getTopic() {
+		return topic;
+	}
+
+	public void setTopic(Topic topic) {
+		this.topic = topic;
+	}
+
+	----
+
+-----------------------------------------------------------------------------------------------
+	
+4.6 Adding Entity Relationship and Extending Repository
+
+Learn how to implement a relationship mapping using @ManyToOne as well as establish relationship based find-filter method in the JPA repository.	
+
+
+changes in CourseRepository.java
+---------------------------------
+
+public interface CourseRepository extends CrudRepository<Course, String>{
+
+	public List<Course> findByTopicId(String topicId); // thing to remember is findBy later member variable(if it is object we have to one step go down and add property also. in above example we have to pull all courses based on topic id -- so it would be findByTopicId)
+}
+
+
+changes in CourseService.java
+-----------------------------
+
+@Service
+public class CourseService {
+
+	@Autowired
+	private CourseRepository courseRepository;
+	
+	public List<Course> getAllCourses(String topicId){
+		List<Course> courses = new ArrayList<>();
+		courseRepository.findByTopicId(topicId)
+		.forEach(courses::add);
+		return courses;
+	}
+	
+	----
+	
+-----------------------------------------------------------------------------------------------
+
+
+5.1 Packaging and running a Spring Boot app
+
+Learn how to package and run your Spring Boot application as a JAR file, and also if necessary, as a WAR file.	
+
+cmd: through cmd prompt to run spring boot application which was packed as .jar file :
+java -jar course-api.jar
+
+
+-----------------------------------------------------------------------------------------------
+
+
+5.2 Spring Boot Actuator
+
+Learn how to use the Spring Actuator dependency to access new monitoring endpoints in yoru Spring Boot application.
+
+
+to know the health of your application on server use the follwoing api
+eg: http://localhost:8080/health
+it list of how much diskspace available on server, which db are we using , is application up or not
+
+o/p: looks like :
+
+
+to get it work we have to add the following dependency in pom
+
+<dependency>
+	<groupId>org.springframework.boot</groupId>
+	<artifactId>spring-boot-starter-actuator</artifactId>
+</dependency>
+
+to know more about actuator URIs visit the following link:
+https://spring.io/guides/gs/actuator-service
+
+
+-----------------------------------------------------------------------------------------------
+
+5.3 Wrap Up
+
+Let's wrap up this course with a summary of what we covered.
